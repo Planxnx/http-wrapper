@@ -2,7 +2,10 @@ module http-wrapper
 
 go 1.17
 
-require k8s.io/apimachinery v0.22.2
+require (
+	github.com/jinzhu/copier v0.3.2
+	k8s.io/apimachinery v0.22.2
+)
 
 require (
 	github.com/go-logr/logr v0.4.0 // indirect
