@@ -71,4 +71,32 @@ func CloneHTTPClientWithHeaders(httpClient *http.Client, headers map[string]stri
 
 }
 
-//TODO: Wrapper Custom Function / Chaining
+type wrapperTransportWithMiddleware struct {
+	baseTransport http.RoundTripper
+	middleware    func(req *http.Request) error
+}
+
+// RoundTrip should not modify the request.
+func (w *wrapperTransportWithMiddleware) RoundTrip(req *http.Request) (*http.Response, error) {
+	if err := w.middleware(req); err != nil {
+		return nil, err
+	}
+	return w.baseTransport.RoundTrip(req)
+}
+
+// WrapHTTPClientWithMiddleware
+// add custom function to middleware
+// should not modify the request.
+func WrapHTTPClientWithMiddleware(httpClient *http.Client, middleware ...func(req *http.Request) error) {
+
+	if httpClient.Transport == nil {
+		httpClient.Transport = http.DefaultTransport
+	}
+
+	for i := len(middleware) - 1; i >= 0; i-- {
+		httpClient.Transport = &wrapperTransportWithMiddleware{
+			baseTransport: httpClient.Transport,
+			middleware:    middleware[i],
+		}
+	}
+}
