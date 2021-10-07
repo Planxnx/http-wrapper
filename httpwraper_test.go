@@ -1,9 +1,10 @@
 package httpwrapper_test
 
 import (
-	httpwrapper "http-wrapper"
 	"net/http"
 	"testing"
+
+	httpwrapper "github.com/Planxnx/http-wrapper"
 )
 
 func TestWrapWithHeader(t *testing.T) {

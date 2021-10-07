@@ -1,4 +1,4 @@
-module http-wrapper
+module github.com/Planxnx/http-wrapper
 
 go 1.17
 
