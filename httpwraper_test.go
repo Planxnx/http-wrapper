@@ -142,7 +142,7 @@ func TestWrapWithCountingFunctionMiddleware(t *testing.T) {
 		counters = append(counters, counter)
 	}
 
-	httpwrapper.WrapHTTPClientWithMiddleware(httpClient, counters...)
+	httpwrapper.WrapHTTPClientWithMiddlewares(httpClient, counters...)
 
 	req, err := http.NewRequest("GET", "https://planxnx.dev", nil)
 	if err != nil {
@@ -173,7 +173,7 @@ func TestWrapWithIndexingFunctionMiddleware(t *testing.T) {
 		})
 	}
 
-	httpwrapper.WrapHTTPClientWithMiddleware(httpClient, middleware...)
+	httpwrapper.WrapHTTPClientWithMiddlewares(httpClient, middleware...)
 
 	req, err := http.NewRequest("GET", "https://planxnx.dev", nil)
 	if err != nil {
@@ -189,4 +189,55 @@ func TestWrapWithIndexingFunctionMiddleware(t *testing.T) {
 			t.Errorf("expected index is %v, got %v \n", expected, indexes[expected])
 		}
 	}
+}
+
+func TestCloneHTTPClientWithMiddlewares(t *testing.T) {
+
+	httpClient := &http.Client{
+		Transport: http.DefaultTransport,
+	}
+
+	expectedCount := 10
+	count := 0
+	counter := func(req *http.Request) error {
+		count++
+		return nil
+	}
+
+	counters := []func(req *http.Request) error{}
+	for i := 0; i < expectedCount; i++ {
+		counters = append(counters, counter)
+	}
+
+	newHTTPClient, err := httpwrapper.CloneHTTPClientWithMiddlewares(httpClient, counters...)
+	if err != nil {
+		t.Error(err)
+	}
+
+	reqA, err := http.NewRequest("GET", "https://planxnx.dev", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := httpClient.Transport.RoundTrip(reqA); err != nil {
+		t.Error(err)
+	}
+
+	if count != 0 {
+		t.Errorf("expected count is %v, got %v \n", 0, count)
+	}
+
+	reqB, err := http.NewRequest("GET", "https://planxnx.dev", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := newHTTPClient.Transport.RoundTrip(reqB); err != nil {
+		t.Error(err)
+	}
+
+	if expectedCount != count {
+		t.Errorf("expected count is %v, got %v \n", expectedCount, count)
+	}
+
 }

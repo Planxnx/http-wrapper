@@ -26,6 +26,7 @@ func (w *wrapperTransportWithHeader) RoundTrip(req *http.Request) (*http.Respons
 }
 
 // WrapHTTPClientWithHeaders
+// add default request headers
 func WrapHTTPClientWithHeaders(httpClient *http.Client, headers map[string]string) {
 
 	if httpClient.Transport != nil {
@@ -43,6 +44,7 @@ func WrapHTTPClientWithHeaders(httpClient *http.Client, headers map[string]strin
 }
 
 // CloneHTTPClientWithHeaders
+// clone httpClient and add default request headers
 func CloneHTTPClientWithHeaders(httpClient *http.Client, headers map[string]string) (*http.Client, error) {
 
 	if httpClient == nil {
@@ -84,10 +86,10 @@ func (w *wrapperTransportWithMiddleware) RoundTrip(req *http.Request) (*http.Res
 	return w.baseTransport.RoundTrip(req)
 }
 
-// WrapHTTPClientWithMiddleware
+// WrapHTTPClientWithMiddlewares
 // add custom function to middleware
 // should not modify the request.
-func WrapHTTPClientWithMiddleware(httpClient *http.Client, middleware ...func(req *http.Request) error) {
+func WrapHTTPClientWithMiddlewares(httpClient *http.Client, middleware ...func(req *http.Request) error) {
 
 	if httpClient.Transport == nil {
 		httpClient.Transport = http.DefaultTransport
@@ -99,4 +101,25 @@ func WrapHTTPClientWithMiddleware(httpClient *http.Client, middleware ...func(re
 			middleware:    middleware[i],
 		}
 	}
+}
+
+// CloneHTTPClientWithMiddlewares
+// clone httpClient and add custom function to middleware
+// should not modify the request.
+func CloneHTTPClientWithMiddlewares(httpClient *http.Client, middleware ...func(req *http.Request) error) (*http.Client, error) {
+
+	if httpClient == nil {
+		return nil, errors.New("http.Client is required")
+	}
+
+	newHttpClient := &http.Client{}
+
+	if err := copier.Copy(newHttpClient, httpClient); err != nil {
+		return nil, err
+	}
+
+	WrapHTTPClientWithMiddlewares(newHttpClient, middleware...)
+
+	return newHttpClient, nil
+
 }
