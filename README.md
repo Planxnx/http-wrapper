@@ -3,7 +3,6 @@
 > **The http.Client wrapper utilies in golang.**
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/Planxnx/http-wrapper.svg)](https://pkg.go.dev/github.com/Planxnx/http-wrapper)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Planxnx/http-wrapper)](https://goreportcard.com/report/github.com/Planxnx/http-wrapper)
 ![GitHub issues](https://img.shields.io/github/issues/Planxnx/http-wrapper)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Planxnx/http-wrapper/blob/main/LICENSE)
 
